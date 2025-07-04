@@ -1,29 +1,76 @@
 class VideoMask {
-  constructor() {
+  constructor(options = {}) {
+    // Настройки по умолчанию
+    this.config = Object.assign({
+      videoSelector: '.video-background',
+      overlaySelector: '.black-overlay',
+      rectanglesSelector: '.mask-rectangle',
+      containerSelector: '.video-container',
+      controlsSelector: '.controls',
+      toggleBtnSelector: '.control-btn--toggle-mask',
+      animateBtnSelector: '.control-btn--animate',
+      randomBtnSelector: '.control-btn--random',
+      autoPlay: true,
+      muted: true,
+      loop: true,
+      playsInline: true,
+      debug: false,
+    }, options);
+
     this.video = null;
     this.blackOverlay = null;
     this.rectangles = [];
     this.maskEnabled = false;
     this.animationId = null;
     this.autoAnimation = false;
+    this.currentMask = null;
 
     this.init();
   }
 
   init() {
-    this.video = document.querySelector('.video-background');
-    this.blackOverlay = document.querySelector('.black-overlay');
-    this.rectangles = document.querySelectorAll('.mask-rectangle');
+    this.video = document.querySelector(this.config.videoSelector);
+    this.blackOverlay = document.querySelector(this.config.overlaySelector);
+    this.rectangles = document.querySelectorAll(this.config.rectanglesSelector);
+
+    if (!this.video) {
+      this.log('Ошибка: Видео не найдено по селектору', this.config.videoSelector);
+      return;
+    }
+
+    if (!this.blackOverlay) {
+      this.log('Ошибка: Черный оверлей не найден по селектору', this.config.overlaySelector);
+      return;
+    }
 
     this.bindEvents();
     this.setupVideo();
   }
 
+  log(message, ...args) {
+    if (this.config.debug) {
+      // Используем более безопасный способ логирования
+      if (typeof window !== 'undefined' && window.console) {
+        // eslint-disable-next-line no-console
+        console.log(`[VideoMask] ${message}`, ...args);
+      }
+    }
+  }
+
+  error(message, ...args) {
+    if (this.config.debug) {
+      if (typeof window !== 'undefined' && window.console) {
+        // eslint-disable-next-line no-console
+        console.error(`[VideoMask] ${message}`, ...args);
+      }
+    }
+  }
+
   bindEvents() {
     // Кнопки управления
-    const toggleMaskBtn = document.querySelector('.control-btn--toggle-mask');
-    const animateBtn = document.querySelector('.control-btn--animate');
-    const randomBtn = document.querySelector('.control-btn--random');
+    const toggleMaskBtn = document.querySelector(this.config.toggleBtnSelector);
+    const animateBtn = document.querySelector(this.config.animateBtnSelector);
+    const randomBtn = document.querySelector(this.config.randomBtnSelector);
 
     if (toggleMaskBtn) {
       toggleMaskBtn.addEventListener('click', this.toggleMask.bind(this));
@@ -43,22 +90,36 @@ class VideoMask {
 
   setupVideo() {
     if (this.video) {
+      // Устанавливаем атрибуты видео
+      if (this.config.autoPlay) {
+        this.video.autoplay = true;
+      }
+      if (this.config.muted) {
+        this.video.muted = true;
+      }
+      if (this.config.loop) {
+        this.video.loop = true;
+      }
+      if (this.config.playsInline) {
+        this.video.playsInline = true;
+      }
+
       // Устанавливаем обработчики для видео
       this.video.addEventListener('loadedmetadata', () => {
         // Видео загружено успешно
-        console.log('Видео загружено:', this.video.videoWidth + 'x' + this.video.videoHeight);
+        this.log('Видео загружено:', this.video.videoWidth + 'x' + this.video.videoHeight);
       });
 
       this.video.addEventListener('error', (_e) => {
         // Ошибка загрузки видео
-        console.error('Ошибка загрузки видео');
+        this.error('Ошибка загрузки видео');
         this.createFallbackBackground();
       });
 
       // Попытка воспроизведения
       this.video.addEventListener('canplay', () => {
         this.video.play().catch((error) => {
-          console.log('Автовоспроизведение заблокировано:', error);
+          this.log('Автовоспроизведение заблокировано:', error);
         });
       });
     }
@@ -66,7 +127,7 @@ class VideoMask {
 
   createFallbackBackground() {
     // Создаем градиентный фон если видео не загрузилось
-    const container = document.querySelector('.video-container');
+    const container = document.querySelector(this.config.containerSelector);
     if (container) {
       container.style.background = 'linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c)';
       container.style.backgroundSize = '400% 400%';
@@ -78,12 +139,22 @@ class VideoMask {
     this.maskEnabled = !this.maskEnabled;
 
     if (this.maskEnabled) {
+      // Проверяем, есть ли активные прямоугольники
+      const activeRectangles = Array.from(this.rectangles).filter((rect) =>
+        rect.classList.contains('active')
+      );
+
+      // Если нет активных прямоугольников, создаем случайную маску
+      if (activeRectangles.length === 0) {
+        this.createRandomMask();
+      }
+
       this.createMask();
     } else {
       this.removeMask();
     }
 
-    const toggleBtn = document.querySelector('.control-btn--toggle-mask');
+    const toggleBtn = document.querySelector(this.config.toggleBtnSelector);
     if (toggleBtn) {
       toggleBtn.classList.toggle('active', this.maskEnabled);
     }
@@ -156,7 +227,7 @@ class VideoMask {
     svg.appendChild(defs);
 
     // Добавляем SVG в контейнер
-    const container = document.querySelector('.video-container');
+    const container = document.querySelector(this.config.containerSelector);
     if (container) {
       container.appendChild(svg);
     }
@@ -186,7 +257,7 @@ class VideoMask {
   toggleAnimation() {
     this.autoAnimation = !this.autoAnimation;
 
-    const animateBtn = document.querySelector('.control-btn--animate');
+    const animateBtn = document.querySelector(this.config.animateBtnSelector);
     if (animateBtn) {
       animateBtn.classList.toggle('active', this.autoAnimation);
     }
@@ -251,20 +322,6 @@ class VideoMask {
     }
   }
 
-  updateMask() {
-    if (this.maskEnabled) {
-      this.createMask();
-    }
-  }
-
-  handleResize() {
-    // Обновляем маску при изменении размера окна
-    if (this.maskEnabled) {
-      this.updateMask();
-    }
-  }
-
-  // Метод для создания кастомной маски
   createCustomMask(rectangles) {
     // Очищаем все прямоугольники
     this.rectangles.forEach((rect) => {
@@ -284,63 +341,17 @@ class VideoMask {
     }
   }
 
-  // Метод для создания анимированной маски
-  createAnimatedMask() {
-    const sequences = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [9, 0, 1],
-      [2, 3, 4],
-      [5, 6, 7],
-      [8, 9, 0]
-    ];
-
-    let currentSequence = 0;
-
-    const animateSequence = () => {
-      if (!this.autoAnimation) {
-        return;
-      }
-
-      this.createCustomMask(sequences[currentSequence]);
-      currentSequence = (currentSequence + 1) % sequences.length;
-
-      setTimeout(animateSequence, 1500);
-    };
-
-    animateSequence();
+  updateMask() {
+    if (this.maskEnabled) {
+      this.createMask();
+    }
   }
 
-  // Метод для создания эффекта печатной машинки
-  createTypewriterMask() {
-    let currentIndex = 0;
-
-    const typewriter = () => {
-      if (!this.autoAnimation) {
-        return;
-      }
-
-      // Активируем следующий прямоугольник
-      if (currentIndex < this.rectangles.length) {
-        this.rectangles[currentIndex].classList.add('active');
-        currentIndex++;
-      } else {
-        // Сбрасываем и начинаем заново
-        this.rectangles.forEach((rect) => {
-          rect.classList.remove('active');
-        });
-        currentIndex = 0;
-      }
-
-      if (this.maskEnabled) {
-        this.updateMask();
-      }
-
-      setTimeout(typewriter, 300);
-    };
-
-    typewriter();
+  handleResize() {
+    // Обновляем маску при изменении размера окна
+    if (this.maskEnabled) {
+      this.updateMask();
+    }
   }
 
   // Метод для уничтожения компонента

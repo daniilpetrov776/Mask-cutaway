@@ -1,5 +1,6 @@
 extends ../components/base/layout
 include ../components/blocks/cards.pug
+include ../components/blocks/navigation.pug
 block variables
   - const title = "ProjectName" //- на страницах кроме главной используйте О нас — ProjectName
   - const wrapperMods = ""
@@ -13,6 +14,7 @@ block main
   main
     //- на странице запрещен "голый" код
     //- все блоки вставляются из папки pug/components/blocks
-    +intro()
-    +cards()
+    //- +intro()
+    //- +cards()
+    +navigation()
 block modals

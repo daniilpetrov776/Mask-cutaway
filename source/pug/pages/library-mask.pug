@@ -1,0 +1,71 @@
+extends ../components/base/layout
+
+block variables
+  - const title = "VideoMask Library Demo"
+  - const wrapperMods = ""
+  - const hasHeader = true
+  - const hasFooter = true
+  - const currentUrl = "library-mask.html"
+
+block main
+  main.library-mask-main
+    .demo-section
+      //- h1.demo-title VideoMask Library Demo
+      //- p.demo-subtitle Демонстрация возможностей библиотеки
+
+    .video-container
+      video.video-background(autoplay, muted, loop, playsinline)
+        source(src="video/fire.mp4", type="video/mp4")
+        | Ваш браузер не поддерживает видео.
+
+      .black-overlay
+
+      .content-layer
+        h1.video-text VideoMask Library
+        p.video-text.subtitle Гибкая библиотека для создания масок
+
+        .mask-rectangles
+          .mask-rectangle.mask-rectangle--1
+          .mask-rectangle.mask-rectangle--2
+          .mask-rectangle.mask-rectangle--3
+          .mask-rectangle.mask-rectangle--4
+          .mask-rectangle.mask-rectangle--5
+          .mask-rectangle.mask-rectangle--6
+          .mask-rectangle.mask-rectangle--7
+          .mask-rectangle.mask-rectangle--8
+          .mask-rectangle.mask-rectangle--9
+          .mask-rectangle.mask-rectangle--10
+
+    .controls
+      button.control-btn.control-btn--toggle-mask(type="button") Включить/Выключить маску
+      button.control-btn.control-btn--animate(type="button") Анимация масок
+      button.control-btn.control-btn--random(type="button") Случайные маски
+      button.control-btn.control-btn--custom(type="button") Кастомная маска
+
+    .demo-info
+      .info-panel
+        h3.info-title Возможности библиотеки
+        ul.info-list
+          li Гибкая конфигурация селекторов
+          li Программное управление масками
+          li Автоматическая анимация
+          li Случайные маски
+          li Кастомные паттерны масок
+          li Режим отладки
+          li TypeScript поддержка
+
+      .code-example
+        h3.code-title Пример использования
+        pre.code-block
+          code.
+            const videoMask = new VideoMask({
+              videoSelector: '.video-background',
+              overlaySelector: '.black-overlay',
+              debug: true
+            });
+
+            // Создать кастомную маску
+            videoMask.createCustomMask([0, 2, 4, 6]);
+
+            // Включить анимацию
+            videoMask.toggleAnimation();
