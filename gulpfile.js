@@ -23,7 +23,7 @@ const refresh = (done) => {
 const syncServer = () => {
   server.init({
     server: 'build/',
-    index: '3d-cube.html',
+    index: 'video-mask.html',
     notify: false,
     open: true,
     cors: true,

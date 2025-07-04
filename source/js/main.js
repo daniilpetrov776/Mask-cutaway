@@ -3,9 +3,6 @@ import {initModals} from './modules/modals/init-modals';
 import {Form} from './modules/form-validate/form';
 import {CustomSelect} from './modules/select/custom-select';
 import {uploadFile, uploadImageDrop} from './modules/input-file/init-upload';
-import init3DCube from './modules/3d-cube/init-3d-cube.js';
-import initParallax from './modules/parallax/init-parallax.js';
-import initExplosion from './modules/explosion/init-explosion.js';
 import initVideoMask from './modules/video-mask/init-video-mask.js';
 
 // ---------------------------------
@@ -31,9 +28,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const form = new Form();
     window.form = form;
     form.init();
-    init3DCube();
-    initParallax();
-    initExplosion();
     initVideoMask();
   });
 });
