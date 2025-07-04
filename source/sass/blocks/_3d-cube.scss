@@ -1,0 +1,90 @@
+.cube-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  perspective: 1000px;
+  perspective-origin: center;
+  margin: 2rem 0;
+}
+
+.cube {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  transform-style: preserve-3d;
+  cursor: grab;
+  will-change: transform;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  // text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+
+  .face-content {
+    text-align: center;
+  }
+}
+
+.cube-face--front {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  transform: translateZ(100px);
+}
+
+.cube-face--back {
+  background: linear-gradient(135deg, #4834d4, #686de0);
+  transform: translateZ(-100px) rotateY(180deg);
+}
+
+.cube-face--right {
+  background: linear-gradient(135deg, #00d2d3, #54a0ff);
+  transform: translateX(100px) rotateY(90deg);
+}
+
+.cube-face--left {
+  background: linear-gradient(135deg, #ff9ff3, #f368e0);
+  transform: translateX(-100px) rotateY(-90deg);
+}
+
+.cube-face--top {
+  background: linear-gradient(135deg, #26de81, #20bf6b);
+  transform: translateY(-100px) rotateX(90deg);
+}
+
+.cube-face--bottom {
+  background: linear-gradient(135deg, #fd79a8, #e84393);
+  transform: translateY(100px) rotateX(-90deg);
+}
+
+
+
+// Анимация при наведении
+.cube:hover {
+  transform: scale(1.05);
+}
+
+// Инструкции
+.cube-container::before {
+  content: 'Кликните и перетаскивайте для вращения';
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+}

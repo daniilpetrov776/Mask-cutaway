@@ -1,0 +1,273 @@
+.video-mask-main {
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// Видео фон (z-index: -1)
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+// Черный оверлей (z-index: 0)
+.black-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 1);
+  z-index: 0;
+}
+
+// Слой контента (z-index: 1)
+.content-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+// Текст
+.video-text {
+  color: white;
+  text-align: center;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+
+  &.subtitle {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+    opacity: 0.9;
+  }
+}
+
+// Основной заголовок
+h1.video-text {
+  font-size: 4rem;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+}
+
+// Невидимые прямоугольники для маски
+.mask-rectangles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mask-rectangle {
+  position: absolute;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  opacity: 0;
+
+  // Позиционирование прямоугольников
+  &--1 {
+    top: 20%;
+    left: 10%;
+    width: 80px;
+    height: 60px;
+  }
+
+  &--2 {
+    top: 40%;
+    left: 60%;
+    width: 120px;
+    height: 40px;
+  }
+
+  &--3 {
+    top: 60%;
+    left: 20%;
+    width: 100px;
+    height: 80px;
+  }
+
+  &--4 {
+    top: 30%;
+    left: 80%;
+    width: 60px;
+    height: 100px;
+  }
+
+  &--5 {
+    top: 70%;
+    left: 70%;
+    width: 90px;
+    height: 50px;
+  }
+
+  &--6 {
+    top: 15%;
+    left: 40%;
+    width: 70px;
+    height: 70px;
+  }
+
+  &--7 {
+    top: 50%;
+    left: 5%;
+    width: 110px;
+    height: 60px;
+  }
+
+  &--8 {
+    top: 80%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+  }
+
+  &--9 {
+    top: 25%;
+    left: 25%;
+    width: 90px;
+    height: 45px;
+  }
+
+  &--10 {
+    top: 65%;
+    left: 85%;
+    width: 50px;
+    height: 90px;
+  }
+
+  // Анимация появления
+  &.active {
+    opacity: 1;
+    animation: rectangle-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes rectangle-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+// Панель управления
+.controls {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 10;
+}
+
+.control-btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(10px);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+
+  &:hover {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.active {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    border-color: #ff6b6b;
+  }
+}
+
+// Адаптивность
+@media (max-width: 768px) {
+  .controls {
+    bottom: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .control-btn {
+    width: 200px;
+  }
+
+  .mask-rectangle {
+    // Уменьшаем размеры прямоугольников на мобильных
+    &--1, &--2, &--3, &--4, &--5,
+    &--6, &--7, &--8, &--9, &--10 {
+      width: 60px;
+      height: 40px;
+    }
+  }
+}
+
+// Дополнительные эффекты
+.video-text {
+  // Добавляем легкое свечение
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+
+  // Анимация появления
+  animation: text-appear 1s ease-out;
+}
+
+@keyframes text-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Эффект при наведении на кнопки
+.control-btn:hover {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}

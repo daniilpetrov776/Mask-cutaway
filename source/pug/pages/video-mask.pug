@@ -1,0 +1,38 @@
+extends ../components/base/layout
+
+block variables
+  - const title = "Видео Маска"
+  - const wrapperMods = ""
+  - const hasHeader = true
+  - const hasFooter = true
+  - const currentUrl = "video-mask.html"
+
+block main
+  main.video-mask-main
+    .video-container
+      video.video-background(autoplay, muted, loop, playsinline)
+        source(src="video/fire.mp4", type="video/mp4")
+        | Ваш браузер не поддерживает видео.
+
+      .black-overlay
+
+      .content-layer
+        h1.video-text Видео Маска
+        p.video-text.subtitle Эффект прозрачного текста
+
+        .mask-rectangles
+          .mask-rectangle.mask-rectangle--1
+          .mask-rectangle.mask-rectangle--2
+          .mask-rectangle.mask-rectangle--3
+          .mask-rectangle.mask-rectangle--4
+          .mask-rectangle.mask-rectangle--5
+          .mask-rectangle.mask-rectangle--6
+          .mask-rectangle.mask-rectangle--7
+          .mask-rectangle.mask-rectangle--8
+          .mask-rectangle.mask-rectangle--9
+          .mask-rectangle.mask-rectangle--10
+
+    .controls
+      button.control-btn.control-btn--toggle-mask(type="button") Включить/Выключить маску
+      button.control-btn.control-btn--animate(type="button") Анимация масок
+      button.control-btn.control-btn--random(type="button") Случайные маски
