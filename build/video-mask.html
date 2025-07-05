@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <title>Видео Маска с Плавными Анимациями</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="ProjectName — описание">
+    <link rel="stylesheet" href="css/style.min.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <main class="video-mask-main">
+        <div class="video-container">
+          <video class="video-background" autoplay muted loop playsinline>
+            <source src="video/fire.mp4" type="video/mp4">Ваш браузер не поддерживает видео.
+          </video>
+          <div class="black-overlay"></div>
+          <div class="content-layer">
+            <h1 class="video-text">Видео Маска</h1>
+            <p class="video-text subtitle">Плавные анимации вырезов</p>
+            <div class="mask-rectangles"></div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="control-btn control-btn--toggle-mask" type="button">Включить/Выключить маску</button>
+          <button class="control-btn control-btn--animate" type="button">Анимация масок</button>
+          <button class="control-btn control-btn--random" type="button">Случайные маски</button>
+          <button class="control-btn control-btn--custom" type="button">Кастомная маска</button>
+        </div>
+        <div class="demo-info">
+          <div class="info-panel">
+            <h3 class="info-title">Новые возможности</h3>
+            <ul class="info-list">
+              <li>Плавные переходы появления/исчезновения</li>
+              <li>Последовательная анимация прямоугольников</li>
+              <li>Улучшенные CSS переходы</li>
+              <li>Более естественные движения</li>
+              <li>Настраиваемые задержки анимации</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/vendor.min.js"></script>
+    <script src="js/main.min.js"></script>
+  </body>
+</html>

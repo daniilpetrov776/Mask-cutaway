@@ -30,6 +30,7 @@ class VideoMask {
     this.currentMask = null;
     this.customMaskEnabled = false;
     this.customConfigs = [];
+    this.previousActiveRectangles = [];
 
     this.init();
   }
@@ -268,25 +269,21 @@ class VideoMask {
       return;
     }
 
-    // Удаляем старую маску перед созданием новой
     if (this.currentMask) {
       this.currentMask.remove();
     }
 
-    // Создаем вырезы в черном фоне
     const activeRectangles = Array.from(this.rectangles).filter((rect) =>
       rect.classList.contains('active')
     );
 
     if (activeRectangles.length === 0) {
-      // Если нет активных прямоугольников, показываем весь черный фон
       this.blackOverlay.style.mask = '';
       this.blackOverlay.style.webkitMask = '';
       this.blackOverlay.style.display = 'block';
       return;
     }
 
-    // Создаем SVG маску
     const maskId = 'video-mask-' + Date.now();
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', '100%');
@@ -302,7 +299,6 @@ class VideoMask {
     const mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
     mask.setAttribute('id', maskId);
 
-    // Создаем белый прямоугольник (фон)
     const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     background.setAttribute('width', '100%');
     background.setAttribute('height', '100%');
@@ -310,10 +306,18 @@ class VideoMask {
 
     mask.appendChild(background);
 
-    // Добавляем черные прямоугольники (вырезы)
+    // Сравнение текущих и предыдущих активных прямоугольников
+    const currentActiveSet = new Set(activeRectangles);
+    const previousActiveSet = new Set(this.previousActiveRectangles);
+
+    // Новые активные прямоугольники (fade-in)
+    const newActive = activeRectangles.filter((rect) => !previousActiveSet.has(rect));
+    // Прямоугольники, ставшие неактивными (fade-out)
+    const newInactive = this.previousActiveRectangles.filter((rect) => !currentActiveSet.has(rect));
+
+    // Добавляем активные прямоугольники
     activeRectangles.forEach((rect) => {
       const rectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-
       const rectBounds = rect.getBoundingClientRect();
       const containerBounds = this.blackOverlay.getBoundingClientRect();
 
@@ -326,7 +330,35 @@ class VideoMask {
       rectElement.setAttribute('y', y);
       rectElement.setAttribute('width', width);
       rectElement.setAttribute('height', height);
+
+      if (newActive.includes(rect)) {
+        rectElement.setAttribute('fill', 'white');
+        rectElement.classList.add('fade-in');
+      } else {
+        rectElement.setAttribute('fill', 'black');
+      }
+
+      mask.appendChild(rectElement);
+    });
+
+    // Добавляем прямоугольники для fade-out
+    newInactive.forEach((rect) => {
+      const rectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rectBounds = rect.getBoundingClientRect();
+      const containerBounds = this.blackOverlay.getBoundingClientRect();
+
+      const x = rectBounds.left - containerBounds.left;
+      const y = rectBounds.top - containerBounds.top;
+      const width = rectBounds.width;
+      const height = rectBounds.height;
+
+      rectElement.setAttribute('x', x);
+      rectElement.setAttribute('y', y);
+      rectElement.setAttribute('width', width);
+      rectElement.setAttribute('height', height);
+
       rectElement.setAttribute('fill', 'black');
+      rectElement.classList.add('fade-out');
 
       mask.appendChild(rectElement);
     });
@@ -334,19 +366,17 @@ class VideoMask {
     defs.appendChild(mask);
     svg.appendChild(defs);
 
-    // Добавляем SVG в контейнер
     const container = document.querySelector(this.config.containerSelector);
     if (container) {
       container.appendChild(svg);
     }
 
-    // Применяем маску к черному фону
     this.blackOverlay.style.mask = `url(#${maskId})`;
     this.blackOverlay.style.webkitMask = `url(#${maskId})`;
     this.blackOverlay.style.display = 'block';
 
-    // Сохраняем ссылку на SVG для удаления
     this.currentMask = svg;
+    this.previousActiveRectangles = activeRectangles; // Обновляем предыдущее состояние
   }
 
   removeMask() {
@@ -360,6 +390,7 @@ class VideoMask {
       this.currentMask.remove();
       this.currentMask = null;
     }
+    this.previousActiveRectangles = []; // Сбрасываем состояние
   }
 
   toggleAnimation() {

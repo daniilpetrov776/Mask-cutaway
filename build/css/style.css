@@ -1890,7 +1890,44 @@ h1.video-text {
   height: 100vh;
   overflow: hidden;
 }
+.video-container svg.video-mask {
+  -webkit-transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
+}
 
+.fade-in {
+  fill: white;
+  -webkit-animation: fadeIn 1s forwards;
+          animation: fadeIn 1s forwards;
+}
+
+.fade-out {
+  fill: black;
+  -webkit-animation: fadeOut 1s forwards;
+          animation: fadeOut 1s forwards;
+}
+
+@-webkit-keyframes fadeIn {
+  to {
+    fill: black;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    fill: black;
+  }
+}
+@-webkit-keyframes fadeOut {
+  to {
+    fill: white;
+  }
+}
+@keyframes fadeOut {
+  to {
+    fill: white;
+  }
+}
 .video-background {
   position: absolute;
   top: 0;

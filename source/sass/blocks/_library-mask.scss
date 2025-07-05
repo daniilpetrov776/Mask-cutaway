@@ -32,6 +32,43 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+
+  svg.video-mask {
+    transition: opacity 0.5s ease-in-out;
+  }
+}
+
+// .animated-rect {
+//   fill: white;
+//   animation: changeFill 1s forwards;
+// }
+
+// @keyframes changeFill {
+//   to {
+//     fill: black;
+//   }
+// }
+
+.fade-in {
+  fill: white;
+  animation: fadeIn 1s forwards;
+}
+
+.fade-out {
+  fill: black;
+  animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    fill: black;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    fill: white;
+  }
 }
 
 // Видео фон (z-index: -1)
