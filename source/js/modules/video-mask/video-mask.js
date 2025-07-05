@@ -116,7 +116,6 @@ class VideoMask {
         if (this.rectangles[item]) {
           this.rectangles[item].classList.add('active');
         }
-        // this.rectangles[item]?.classList.add('active');
       } else if (typeof item === 'object') {
         for (const key in item) {
           if (Object.prototype.hasOwnProperty.call(item, key)) {
