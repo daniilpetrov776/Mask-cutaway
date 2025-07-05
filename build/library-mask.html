@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <title>VideoMask Library Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="ProjectName — описание">
+    <link rel="stylesheet" href="css/style.min.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <main class="library-mask-main">
+        <div class="demo-section"></div>
+        <div class="video-container">
+          <video class="video-background" autoplay muted loop playsinline>
+            <source src="video/fire.mp4" type="video/mp4">Ваш браузер не поддерживает видео.
+          </video>
+          <div class="black-overlay"></div>
+          <div class="content-layer">
+            <h1 class="video-text">VideoMask Library</h1>
+            <p class="video-text subtitle">Гибкая библиотека для создания масок</p>
+            <div class="mask-rectangles"></div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="control-btn control-btn--toggle-mask" type="button">Включить/Выключить маску</button>
+          <button class="control-btn control-btn--animate" type="button">Анимация масок</button>
+          <button class="control-btn control-btn--random" type="button">Случайные маски</button>
+          <button class="control-btn control-btn--custom" type="button">Кастомная маска</button>
+        </div>
+        <div class="demo-info">
+          <div class="info-panel">
+            <h3 class="info-title">Возможности библиотеки</h3>
+            <ul class="info-list">
+              <li>Гибкая конфигурация селекторов</li>
+              <li>Программное управление масками</li>
+              <li>Автоматическая анимация</li>
+              <li>Случайные маски</li>
+              <li>Кастомные паттерны масок</li>
+              <li>Режим отладки</li>
+              <li>TypeScript поддержка</li>
+            </ul>
+          </div>
+          <div class="code-example">
+            <h3 class="code-title">Пример использования</h3>
+            <pre class="code-block"><code>const videoMask = new VideoMask({
+  videoSelector: '.video-background',
+  overlaySelector: '.black-overlay',
+  debug: true
+});
+
+// Создать кастомную маску
+videoMask.createCustomMask([0, 2, 4, 6]);
+
+// Включить анимацию
+videoMask.toggleAnimation();</code></pre>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/vendor.min.js"></script>
+    <script src="js/main.min.js"></script>
+  </body>
+</html>

@@ -4,12 +4,15 @@ class VideoMask {
     this.config = Object.assign({
       videoSelector: '.video-background',
       overlaySelector: '.black-overlay',
-      rectanglesSelector: '.mask-rectangle',
+      rectanglesContainerSelector: '.mask-rectangles',
+      maskCount: 5,
+      randomness: 0.5,
       containerSelector: '.video-container',
       controlsSelector: '.controls',
       toggleBtnSelector: '.control-btn--toggle-mask',
       animateBtnSelector: '.control-btn--animate',
       randomBtnSelector: '.control-btn--random',
+      customBtnSelector: '.control-btn--toggle-custom',
       autoPlay: true,
       muted: true,
       loop: true,
@@ -19,11 +22,14 @@ class VideoMask {
 
     this.video = null;
     this.blackOverlay = null;
+    this.rectanglesContainer = null;
     this.rectangles = [];
     this.maskEnabled = false;
     this.animationId = null;
     this.autoAnimation = false;
     this.currentMask = null;
+    this.customMaskEnabled = false;
+    this.customConfigs = [];
 
     this.init();
   }
@@ -31,7 +37,7 @@ class VideoMask {
   init() {
     this.video = document.querySelector(this.config.videoSelector);
     this.blackOverlay = document.querySelector(this.config.overlaySelector);
-    this.rectangles = document.querySelectorAll(this.config.rectanglesSelector);
+    this.rectanglesContainer = document.querySelector(this.config.rectanglesContainerSelector);
 
     if (!this.video) {
       this.log('Ошибка: Видео не найдено по селектору', this.config.videoSelector);
@@ -43,8 +49,122 @@ class VideoMask {
       return;
     }
 
+    if (!this.rectanglesContainer) {
+      this.log('Error: rectangles container not found for selector', this.config.rectanglesContainerSelector);
+      return;
+    }
+
+    this.createRectangles();
     this.bindEvents();
     this.setupVideo();
+  }
+
+  createRectangles() {
+    // Генерируем прямоугольники с относительными координатами и рандомными размерами
+    this.rectanglesContainer.innerHTML = '';
+    this.rectangles = [];
+
+    const {maskCount, randomness} = this.config;
+    const baseW = 1 / 7;
+    const baseH = 1 / 8;
+    const {width: cw, height: ch} = this.rectanglesContainer.getBoundingClientRect();
+
+    for (let i = 0; i < maskCount; i++) {
+      const rect = document.createElement('div');
+      rect.classList.add('mask-rectangle');
+      rect.style.position = 'absolute';
+
+      // Рандомизируем размеры вокруг базовых фракций
+      const wFrac = baseW * (1 + (Math.random() * 2 - 1) * randomness);
+      const hFrac = baseH * (1 + (Math.random() * 2 - 1) * randomness);
+      const xFrac = Math.random() * (1 - wFrac);
+      const yFrac = Math.random() * (1 - hFrac);
+
+      // Сохраняем относительные данные
+      rect.dataset.relative = JSON.stringify({xFrac, yFrac, wFrac, hFrac});
+
+      // Устанавливаем абсолютные стили
+      rect.style.width = `${wFrac * cw}px`;
+      rect.style.height = `${hFrac * ch}px`;
+      rect.style.left = `${xFrac * cw}px`;
+      rect.style.top = `${yFrac * ch}px`;
+
+      this.rectanglesContainer.appendChild(rect);
+      this.rectangles.push(rect);
+    }
+  }
+
+  updateRectangles() {
+    // При ресайзе пересчитываем абсолютные стили по сохранённым относительным
+    const {width: cw, height: ch} = this.rectanglesContainer.getBoundingClientRect();
+    this.rectangles.forEach((rect) => {
+      const {xFrac, yFrac, wFrac, hFrac} = JSON.parse(rect.dataset.relative);
+      rect.style.width = `${wFrac * cw}px`;
+      rect.style.height = `${hFrac * ch}px`;
+      rect.style.left = `${xFrac * cw}px`;
+      rect.style.top = `${yFrac * ch}px`;
+    });
+  }
+
+  // Кастомная маска: можно передать [{0:[x,y]},2,3]
+  createCustomMask(configs = []) {
+    this.customConfigs = configs;
+    this.rectangles.forEach((r) => r.classList.remove('active'));
+    const {width: cw, height: ch} = this.rectanglesContainer.getBoundingClientRect();
+    configs.forEach((item) => {
+      if (typeof item === 'number') {
+        if (this.rectangles[item]) {
+          this.rectangles[item].classList.add('active');
+        }
+        // this.rectangles[item]?.classList.add('active');
+      } else if (typeof item === 'object') {
+        for (const key in item) {
+          if (Object.prototype.hasOwnProperty.call(item, key)) {
+            const idx = +key;
+            const [xp, yp] = item[key];
+            const rect = this.rectangles[idx];
+            if (!rect) {
+              continue;
+            }
+            const rel = JSON.parse(rect.dataset.relative);
+            rel.xFrac = (xp / 100) * (1 - rel.wFrac);
+            rel.yFrac = (yp / 100) * (1 - rel.hFrac);
+            rect.dataset.relative = JSON.stringify(rel);
+            rect.style.left = `${rel.xFrac * cw}px`;
+            rect.style.top = `${rel.yFrac * ch}px`;
+            rect.classList.add('active');
+          }
+        }
+      }
+    });
+    if (this.maskEnabled || this.customMaskEnabled) {
+      this.createMask();
+    }
+  }
+
+  // Переключает кастомную маску (использует сохранённые конфиги)
+  toggleCustomMask(configs = null) {
+    // Если переданы новые конфиги, сохраняем их
+    if (configs) {
+      this.customConfigs = configs;
+    }
+    this.customMaskEnabled = !this.customMaskEnabled;
+    const toggleBtn = document.querySelector(this.config.toggleBtnSelector);
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', this.customMaskEnabled);
+    }
+
+    if (this.customMaskEnabled) {
+      this.createCustomMask(this.customConfigs);
+      this.maskEnabled = true;
+    } else {
+      this.removeMask();
+      this.maskEnabled = false;
+    }
+
+    if (document.querySelector(this.config.customBtnSelector)) {
+      this.config.customBtnSelector.classList.toggle('active', this.customMaskEnabled);
+    }
   }
 
   log(message, ...args) {
@@ -71,6 +191,7 @@ class VideoMask {
     const toggleMaskBtn = document.querySelector(this.config.toggleBtnSelector);
     const animateBtn = document.querySelector(this.config.animateBtnSelector);
     const randomBtn = document.querySelector(this.config.randomBtnSelector);
+    const customBtn = document.querySelector(this.config.customBtnSelector);
 
     if (toggleMaskBtn) {
       toggleMaskBtn.addEventListener('click', this.toggleMask.bind(this));
@@ -84,45 +205,28 @@ class VideoMask {
       randomBtn.addEventListener('click', this.createRandomMask.bind(this));
     }
 
+    if (customBtn) {
+      customBtn.addEventListener('click', this.toggleCustomMask.bind(this));
+    }
+
     // Обработка изменения размера окна
     window.addEventListener('resize', this.handleResize.bind(this));
   }
 
   setupVideo() {
-    if (this.video) {
-      // Устанавливаем атрибуты видео
-      if (this.config.autoPlay) {
-        this.video.autoplay = true;
-      }
-      if (this.config.muted) {
-        this.video.muted = true;
-      }
-      if (this.config.loop) {
-        this.video.loop = true;
-      }
-      if (this.config.playsInline) {
-        this.video.playsInline = true;
-      }
-
-      // Устанавливаем обработчики для видео
-      this.video.addEventListener('loadedmetadata', () => {
-        // Видео загружено успешно
-        this.log('Видео загружено:', this.video.videoWidth + 'x' + this.video.videoHeight);
-      });
-
-      this.video.addEventListener('error', (_e) => {
-        // Ошибка загрузки видео
-        this.error('Ошибка загрузки видео');
-        this.createFallbackBackground();
-      });
-
-      // Попытка воспроизведения
-      this.video.addEventListener('canplay', () => {
-        this.video.play().catch((error) => {
-          this.log('Автовоспроизведение заблокировано:', error);
-        });
-      });
+    const v = this.video;
+    if (!v) {
+      return;
     }
+    v.autoplay = this.config.autoPlay;
+    v.muted = this.config.muted;
+    v.loop = this.config.loop;
+    v.playsInline = this.config.playsInline;
+    v.addEventListener('loadedmetadata', () => this.log('Video loaded:', `${v.videoWidth}x${v.videoHeight}`));
+    v.addEventListener('error', () => {
+      this.error('Video load error'); this.createFallbackBackground();
+    });
+    v.addEventListener('canplay', () => v.play().catch((e) => this.log('Autoplay blocked:', e)));
   }
 
   createFallbackBackground() {
@@ -163,6 +267,11 @@ class VideoMask {
   createMask() {
     if (!this.blackOverlay) {
       return;
+    }
+
+    // Удаляем старую маску перед созданием новой
+    if (this.currentMask) {
+      this.currentMask.remove();
     }
 
     // Создаем вырезы в черном фоне
@@ -322,25 +431,6 @@ class VideoMask {
     }
   }
 
-  createCustomMask(rectangles) {
-    // Очищаем все прямоугольники
-    this.rectangles.forEach((rect) => {
-      rect.classList.remove('active');
-    });
-
-    // Активируем указанные прямоугольники
-    rectangles.forEach((index) => {
-      if (this.rectangles[index]) {
-        this.rectangles[index].classList.add('active');
-      }
-    });
-
-    // Обновляем маску если она включена
-    if (this.maskEnabled) {
-      this.updateMask();
-    }
-  }
-
   updateMask() {
     if (this.maskEnabled) {
       this.createMask();
@@ -349,6 +439,7 @@ class VideoMask {
 
   handleResize() {
     // Обновляем маску при изменении размера окна
+    this.updateRectangles();
     if (this.maskEnabled) {
       this.updateMask();
     }

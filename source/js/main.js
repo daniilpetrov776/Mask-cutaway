@@ -3,7 +3,7 @@ import {initModals} from './modules/modals/init-modals';
 import {Form} from './modules/form-validate/form';
 import {CustomSelect} from './modules/select/custom-select';
 import {uploadFile, uploadImageDrop} from './modules/input-file/init-upload';
-import initVideoMask from './modules/video-mask/init-video-mask.js';
+// import initVideoMask from './modules/video-mask/init-video-mask.js';
 import initLibraryDemo from './modules/video-mask/library-demo.js';
 
 // ---------------------------------
@@ -29,12 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const form = new Form();
     window.form = form;
     form.init();
-    initVideoMask();
-
-    // Инициализируем демо библиотеки если находимся на странице library-mask
-    if (window.location.pathname.includes('library-mask')) {
-      initLibraryDemo();
-    }
+    initLibraryDemo();
   });
 });
 

@@ -23,7 +23,7 @@ const refresh = (done) => {
 const syncServer = () => {
   server.init({
     server: 'build/',
-    index: 'video-mask.html',
+    index: 'library-mask.html',
     notify: false,
     open: true,
     cors: true,
