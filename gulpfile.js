@@ -23,7 +23,7 @@ const refresh = (done) => {
 const syncServer = () => {
   server.init({
     server: 'build/',
-    index: 'library-mask.html',
+    index: 'index.html',
     notify: false,
     open: true,
     cors: true,
